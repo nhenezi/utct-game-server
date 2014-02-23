@@ -18,6 +18,7 @@ app.io.route('match', {
   },
 });
 
+sprckala sam
 client.subscribe('nextMove');
 client.on('message', function(channel, data) {
   data = JSON.parse(data);
