@@ -49,9 +49,10 @@ def winner(board):
       return board[6]
     
   tie = True
+
   for field in board:
-    if field == EMPYT_VALUE:
-      tie = false
+    if field == EMPTY_VALUE:
+      tie = False
       break
   if tie is True:
     return TIE
