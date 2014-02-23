@@ -23,7 +23,7 @@ client.on('message', function(channel, data) {
   console.log(channel, data);
   if  (channel === 'nextMove') {
     console.log('pass');
-    var socket = app.io.sockets;
+    var socket = app.io.sockets.sockets[data.socket_id];
     console.log(data.socket_id); 
     console.log('DDDDD', data, data.socket_id, data['socket_id']);
     console.log(socket);
