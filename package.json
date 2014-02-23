@@ -5,7 +5,7 @@
   "description": "Ultimate Tic-Tac-Toe (ultimatetct.com) game server",
   "private": true,
   "scripts": {
-    "start": "node ./server.js",
+    "start": "node ./server.js"
   },
   "dependencies": {
     "express.io": "~1.1.13",
