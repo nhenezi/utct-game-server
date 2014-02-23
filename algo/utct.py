@@ -4,11 +4,8 @@ PLAYER_X = 1
 PLAYER_Y = 2
 EMPTY_VALUE = 0
 
-def is_allowed_move(main_board_move, boards_move, data):
+def is_allowed_move(main_board_move, boards_move, main_board, boards):
   '''Checks if move is valid'''
-  main_board = data['main_board']
-  boards = data['boards']
-
   # if main board is populated
   if main_board[main_board_move] != EMPTY_VALUE:
     return False
