@@ -2,7 +2,9 @@
 
 PLAYER_X = 1
 PLAYER_Y = 2
-EMPTY_VALUE = 0
+TIE = 0
+EMPTY_VALUE = -1
+
 
 def is_allowed_move(main_board_move, boards_move, main_board, boards):
   '''Checks if move is valid'''
@@ -17,7 +19,7 @@ def is_allowed_move(main_board_move, boards_move, main_board, boards):
 def winner(board):
   '''
   Returns winner of `board`
-  winner can be either PLAYER_X, PLAYER_Y or False if no one won on board
+  winner can be either PLAYER_X, PLAYER_Y, TIE or False if no one won on board
   board is list of 9 elements, representing one tic-tac-toe board
   '''
   if board[0] != EMPTY_VALUE:
@@ -46,4 +48,12 @@ def winner(board):
     if board[6] == board[7] and board[7] == board[8]:
       return board[6]
     
-  return False
+  tie = True
+  for field in board:
+    if field == EMPYT_VALUE:
+      tie = false
+      break
+  if tie is True:
+    return TIE
+  else:
+    return False
