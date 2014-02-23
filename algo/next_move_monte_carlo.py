@@ -15,7 +15,7 @@ def send_move(n, oldData):
   rc.publish('nextMove', json.dumps(data))
 
 # precision
-NUMBER_OF_SIMULATIONS = 100
+NUMBER_OF_SIMULATIONS = 1000
 
 def calculate_next_move(data):
   player = data['next_move']
