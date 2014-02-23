@@ -1,5 +1,7 @@
 #! /usr/bin/python
 
+import random
+
 PLAYER_X = 1
 PLAYER_Y = 2
 TIE = 0
@@ -15,6 +17,21 @@ def is_allowed_move(main_board_move, boards_move, main_board, boards):
   if boards[main_board_move][boards_move] != EMPTY_VALUE:
     return False
   return True
+
+def get_valid_moves(board):
+  return map(lambda x: x == EMPTY_VALUE, board)
+
+def get_rand_move(board):
+  '''Finds random move on board, returns False if no move is valid'''
+  valid_moves = []
+  ss = get_valid_moves(board)
+  for i, valid in enumerate(ss):
+    if valid:
+      valid_moves.append(i)
+  if valid_moves:
+    return random.choice(valid_moves)
+  return False
+
 
 def winner(board):
   '''
