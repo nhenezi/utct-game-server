@@ -7,17 +7,19 @@ import json
 import redis
 from pprint import pprint
 
-def send_move(n, oldData):
+def send_move(main_board_move, boards_move, oldData):
+  # converion to specified format
+  best_move = 9 * main_board_move + boards_move
   data = {
     'socket_id': oldData['socket_id'],
-    'next_move': n
+    'next_move': best_move
   }
   rc.publish('nextMove', json.dumps(data))
 
 # precision
 NUMBER_OF_SIMULATIONS = 1000
 
-def calculate_next_move(data):
+def calculate_next_move(data, no_send = False):
   player = data['next_move']
   winning_moves = [[0 for _ in xrange(9)] for _ in xrange(9)]
   tying_moves = [[1 for _ in xrange(9)] for _ in xrange(9)]
@@ -73,7 +75,9 @@ def calculate_next_move(data):
                                                      losing_moves)
 
   best_move = find_best_move(winning_percentages)
-  send_move(best_move, data)
+  if no_send is False:
+    send_move(best_move['main_board'], best_move['boards'] , data)
+  return best_move
 
 def calculate_winning_percentages(winning_moves, tying_moves, losing_moves):
   winning_percentages = [[0 for _ in xrange(9)] for _ in xrange(9)]
@@ -101,9 +105,10 @@ def find_best_move(winning_percentages):
     best_move_values.append(boards[best_move])
 
   best_big_move = max_index_in_list(best_move_values)
-  # converion to specified format
-  best_move = 9 * best_big_move + best_moves[best_big_move]
-  return best_move
+  return {
+    'main_board': best_big_move,
+    'boards': best_moves[best_big_move]
+    }
 
 
 if __name__ == "__main__":

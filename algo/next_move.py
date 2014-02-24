@@ -3,11 +3,12 @@
 import json
 import redis
 
-
-def send_move(n, oldData):
+def send_move(main_board_move, boards_move, oldData):
+  # converion to specified format
+  best_move = 9 * main_board_move + boards_move
   data = {
     'socket_id': oldData['socket_id'],
-    'next_move': n
+    'next_move': best_move
   }
   rc.publish('nextMove', json.dumps(data))
   
@@ -17,9 +18,10 @@ def calculate_next_move(data):
   #...
   #...
   # calculation is done
-  next_move = 5
+  next_move_main_board = 5
+  next_move_boards = 3
   # send next move
-  send_move(next_move, data)
+  send_move(next_move_main_board, next_move_boards, data)
 
 
 if __name__ == "__main__":
