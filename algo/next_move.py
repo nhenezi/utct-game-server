@@ -21,7 +21,10 @@ def calculate_next_move(data):
   next_move_main_board = 5
   next_move_boards = 3
   # send next move
-  send_move(next_move_main_board, next_move_boards, data)
+  return {
+    'main_board': next_move_main_board,
+    'boards': next_move_boards
+  }
 
 
 if __name__ == "__main__":
@@ -31,6 +34,8 @@ if __name__ == "__main__":
 
   for item in ps.listen():
     if item['type'] == 'message' and item['channel'] == 'calculateNextMove':
-      calculate_next_move(json.loads(item['data']))
+      data = json.loads(item['data'])
+      next_move = calculate_next_move(data)
+      send_move(next_move['main_board'], next_move['boards'], data)
 
 
