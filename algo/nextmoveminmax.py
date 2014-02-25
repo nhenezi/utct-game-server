@@ -20,11 +20,11 @@ brojac = 0
 dubina = 6
 okvir = 0
 
-pobjeda = [ int('111000000',2) , int('000111000', 2), int('000000111',2), 
-		int('100100100', 2) , int('010010010',2) , int('001001001',2), 
-		int('100010001', 2) , int('001010100', 2)]
+pobjeda = [ int('111000000',2) , int('000111000', 2), int('000000111',2),
+   int('100100100', 2) , int('010010010',2) , int('001001001',2), int('100010001', 2) , int('001010100', 2)]
 		
 		
+
 def loadgame(gamename):
 	file = open(gamename, 'r')
 	tablica = []
@@ -108,10 +108,13 @@ def xchild(pozicija, move):
 	return position(x, pozicija.o)
 
 
-def ochild(pozicija, move):
+def ochild(pozicija, move): return child(pozicija, move, 'o')
 	o = pozicija.o[:move-1] + '1' + pozicija.o[move:]
 	return position(pozicija.x, o)
 
+def child(pozicija, move, plazer):
+	z = pozicija[plazer][:move-1] + '1' + pozicija[plazer][move:]
+	return position(pozicija.x, z)
 
 def uxchild(igra, move):
 	igra.polje[igra.okvir] = xchild(igra.polje[igra.okvir], move)
@@ -319,7 +322,7 @@ def sendmove(n, oldData):
   rc.publish('nextMove', json.dumps(data))
 		
       
-#############	MAIN	##################
+#############	MAIN	#################
 igra = ploca()
 igra = loadgame('uigra1')
 #igra.okvir = 4
