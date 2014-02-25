@@ -75,8 +75,6 @@ def calculate_next_move(data, no_send = False):
                                                      losing_moves)
 
   best_move = find_best_move(winning_percentages)
-  if no_send is False:
-    send_move(best_move['main_board'], best_move['boards'] , data)
   return best_move
 
 def calculate_winning_percentages(winning_moves, tying_moves, losing_moves):
@@ -119,5 +117,5 @@ if __name__ == "__main__":
   for item in ps.listen():
     if item['type'] == 'message' and item['channel'] == 'calculateNextMove':
       data = json.loads(item['data'])
-      best_move = calculate_next_move(data))
+      best_move = calculate_next_move(data)
       send_move(best_move['main_board'], best_move['boards'], data)
