@@ -19,11 +19,10 @@ def send_move(main_board_move, boards_move, oldData):
 # precision
 NUMBER_OF_SIMULATIONS = 1000
 
-def calculate_next_move(data, no_send = False):
+def calculate_next_move(data):
   player = data['next_move']
   winning_moves = [[0 for _ in xrange(9)] for _ in xrange(9)]
-  tying_moves = [[1 for _ in xrange(9)] for _ in xrange(9)]
-  losing_moves = [[1 for _ in xrange(9)] for _ in xrange(9)]
+  losing_moves = [[0 for _ in xrange(9)] for _ in xrange(9)]
   game_over = False
 
   for i in xrange(NUMBER_OF_SIMULATIONS):
@@ -62,36 +61,24 @@ def calculate_next_move(data, no_send = False):
       on_move = utct.PLAYER_X if on_move == utct.PLAYER_Y else utct.PLAYER_Y
 
     winning_player = utct.winner(main_board)
+    # TODO keep track of ties and use them in some kind of evaulation function (for final result)
     if winning_player == player:
       winning_moves[next_main_board_move][next_boards_move] += 1;
-    elif winning_player == utct.TIE:
-      tying_moves[next_main_board_move][next_boards_move] += 1;
     else:
       losing_moves[next_main_board_move][next_boards_move] += 1;
 
-  if game_over is True:
+  if game_over is true:
     return
-  winning_percentages = calculate_winning_percentages(winning_moves, tying_moves,
-                                                     losing_moves)
-
-  best_move = find_best_move(winning_percentages)
-  if no_send is False:
-    send_move(best_move['main_board'], best_move['boards'] , data)
-  return best_move
-
-def calculate_winning_percentages(winning_moves, tying_moves, losing_moves):
   winning_percentages = [[0 for _ in xrange(9)] for _ in xrange(9)]
-  # win percentage = (2 * number of winning moves + number of tying moves)/
-  # (2 * number of winning moves + number of tying moves + number of losing moves)
+  # win percentage = (number of winning moves)/(total number of moves)
   for main_board in xrange(9):
     for board in xrange(9):
-      winning_percentages[main_board][board] = float(2 * winning_moves[main_board][board] \
-                                                     + tying_moves[main_board][board]) \
-        / float(2 * winning_moves[main_board][board] + tying_moves[main_board][board] + \
-                losing_moves[main_board][board])
-  return winning_percentages
+      if winning_moves[main_board][board] > 0:
+        winning_percentages[main_board][board] = float(winning_moves[main_board][board]) \
+          / float(winning_moves[main_board][board] + losing_moves[main_board][board])
+      else:
+        winning_percentages[main_board][board] = 0
 
-def find_best_move(winning_percentages):
   # findes index of a maximum element in a list
   def max_index_in_list(a):
     return max(enumerate(a),key=lambda x: x[1])[0]
@@ -105,11 +92,13 @@ def find_best_move(winning_percentages):
     best_move_values.append(boards[best_move])
 
   best_big_move = max_index_in_list(best_move_values)
-  return {
+  best_move = {
     'main_board': best_big_move,
     'boards': best_moves[best_big_move]
-    }
-
+  }
+  if no_send is False:
+    send_move(best_move['main_board'], best_move['boards'] , data)
+  return best_move
 
 if __name__ == "__main__":
   rc = redis.Redis();
@@ -118,6 +107,5 @@ if __name__ == "__main__":
 
   for item in ps.listen():
     if item['type'] == 'message' and item['channel'] == 'calculateNextMove':
-      data = json.loads(item['data'])
-      best_move = calculate_next_move(data))
-      send_move(best_move['main_board'], best_move['boards'], data)
+      calculate_next_move(json.loads(item['data']))
+
