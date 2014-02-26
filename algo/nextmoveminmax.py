@@ -2,8 +2,10 @@
 
 import json
 import redis
+import utct
 
 win = 100
+dubina = 4
 
 def send_move(main_board_move, boards_move, oldData):
   # convertion to specified format
@@ -17,13 +19,8 @@ def send_move(main_board_move, boards_move, oldData):
   
 def calculate_next_move(data):
   print data
-  #...
-  #...
-  #...
-  #...
-  # calculation is done
-  next_move_main_board = 5
-  next_move_boards = 3
+  next_move_main_board, next_move_boards = negamax(data, -1000, 1000, dubina, 1)[1:3]
+  print next_move_main_board, next_move_boards
   # send next move
   return {
     'main_board': next_move_main_board,
@@ -55,6 +52,52 @@ def evaluate(data):
   return -win
   
   
+def negamax(data, alpha, beta, depth, color):
+  on_move = data['next_move']
+  next_main_board_move = None
+  next_boards_move = None
+  main_board_move = None
+  boards_move = None
+  
+  if depth == 0: #or node is a terminal node
+    return color * evaluate(data), main_board_move, boards_move
+        
+  bestValue = -1000
+    
+# legalni potezi u dozvoljenom okviru
+  valid_board = data['next_board']
+  legal_moves = {}
+  if valid_board : 
+    board = data['boards'][valid_board]
+    legal_moves[valid_board] = utct.get_valid_moves(board)
+    
+# dozvoljeni potezi na cijelom boards, kada je dozvoljeno igrati bilo gdje
+  else:
+    for i in xrange(9):
+      board = data['boards'][i]
+      #print board
+      legal_moves[i] = utct.get_valid_moves(board)
+  print legal_moves    
+  for i in set(legal_moves) :
+    next_main_board_move = i
+    for j in xrange(9):
+      if legal_moves[i][j]:
+        next_boards_move =  j
+        ## make move
+        data = make_move(next_main_board_move, next_boards_move, data ) 
+        score = -negamax(data, -beta, -alpha, depth-1, -color)[0]
+        data = undo_move(next_main_board_move, next_boards_move, data )
+        
+        if score >= beta:
+          return beta, main_board_move, boards_move
+        if score > alpha:
+          alpha = score
+          if color == 1 and depth == dubina:
+            main_board_move = next_main_board_move
+            boards_move = next_boards_move
+  return alpha, main_board_move, boards_move
+
+ 
 if __name__ == "__main__":
   rc = redis.Redis();
   ps = rc.pubsub()
@@ -64,6 +107,7 @@ if __name__ == "__main__":
     if item['type'] == 'message' and item['channel'] == 'calculateNextMove':
       data = json.loads(item['data'])
       next_move = calculate_next_move(data)
+
       send_move(next_move['main_board'], next_move['boards'], data)
 
 
