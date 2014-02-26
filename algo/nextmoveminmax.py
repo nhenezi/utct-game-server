@@ -31,7 +31,7 @@ def calculate_next_move(data):
 
 def make_move(main_board_move, boards_move, data):
   data['boards'][main_board_move][boards_move] = data['next_move']
-  data['main_board'][main_board_move] = utct.EMPTY_VALUE if utct.winner(data['boards'][main_board_move]) == False else utct.winner(data['boards'][main_board_move])
+  data['main_board'][main_board_move] = utct.EMPTY_VALUE if utct.winner(data['boards'][main_board_move]) is False else utct.winner(data['boards'][main_board_move])
   data['next_board'] = boards_move
   data['next_move']= utct.PLAYER_X if data['next_move'] == utct.PLAYER_Y else utct.PLAYER_Y
   return data
@@ -39,10 +39,18 @@ def make_move(main_board_move, boards_move, data):
   
 def undo_move(main_board_move, boards_move, data):
   data['boards'][main_board_move][boards_move] = utct.EMPTY_VALUE
-  data['main_board'][main_board_move] = utct.EMPTY_VALUE if utct.winner(data['boards'][main_board_move]) == False else utct.winner(data['boards'][main_board_move])
+  data['main_board'][main_board_move] = utct.EMPTY_VALUE if utct.winner(data['boards'][main_board_move]) is False else utct.winner(data['boards'][main_board_move])
   data['next_board'] = main_board_move
   data['next_move'] = utct.PLAYER_X if data['next_move'] == utct.PLAYER_Y else utct.PLAYER_Y
   return data
+  
+  
+def evaluate(data):
+  if utct.winner(data['main_board']) is False:
+    return 0
+  elif utct.winner(data['main_board']) != data['next_move'] :
+    return win
+  return -win
   
   
 if __name__ == "__main__":
