@@ -3,6 +3,8 @@
 import json
 import redis
 
+win = 100
+
 def send_move(main_board_move, boards_move, oldData):
   # convertion to specified format
   best_move = 9 * main_board_move + boards_move
