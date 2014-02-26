@@ -7,6 +7,21 @@ import utct
 win = 100
 dubina = 4
 
+
+def initialize():
+
+  data ={}
+  data['main_board'] = [utct.EMPTY_VALUE]*9
+  boards = []
+  for i in range(9):
+    boards += [[utct.EMPTY_VALUE]*9]
+  data['boards'] =  boards
+  data['next_move'] = 1
+  data['next_board'] = False
+  data['socket_id'] = 'ztF4rnYQIWWzWKWICJJw'
+  return data
+  
+
 def send_move(main_board_move, boards_move, oldData):
   # convertion to specified format
   best_move = 9 * main_board_move + boards_move
@@ -18,8 +33,8 @@ def send_move(main_board_move, boards_move, oldData):
   
   
 def calculate_next_move(data):
-  print data
-  next_move_main_board, next_move_boards = negamax(data, -1000, 1000, dubina, 1)[1:3]
+  value, next_move_main_board, next_move_boards = negamax(data, -1000, 1000, dubina, 1)
+  print 'vrijednost negamax', value
   print next_move_main_board, next_move_boards
   # send next move
   return {
@@ -45,11 +60,23 @@ def undo_move(main_board_move, boards_move, data):
   
   
 def evaluate(data):
-  if utct.winner(data['main_board']) is False:
-    return 0
-  elif utct.winner(data['main_board']) != data['next_move'] :
+  if utct.winner(data['main_board']) == data['next_move'] :
     return win
-  return -win
+    
+  elif utct.winner(data['main_board']) != data['next_move'] :
+    return -win
+    
+  else:
+    ret_val = 0
+    for i in range(9):
+      if data['main_board'][i] != utct.TIE and data['main_board'][i] != EMPTY_VALUE:
+        if data['main_board'][i] != data['next_move']:
+          ret_val -= 10
+          print 'retval -10'
+        elif data['main_board'][i] == data['next_move']:
+          ret_val += 10
+          print 'retval -10 '
+  return ret_val
   
   
 def negamax(data, alpha, beta, depth, color):
@@ -77,7 +104,7 @@ def negamax(data, alpha, beta, depth, color):
       board = data['boards'][i]
       #print board
       legal_moves[i] = utct.get_valid_moves(board)
-  print legal_moves    
+  #print legal_moves    
   for i in set(legal_moves) :
     next_main_board_move = i
     for j in xrange(9):
@@ -95,20 +122,45 @@ def negamax(data, alpha, beta, depth, color):
           if color == 1 and depth == dubina:
             main_board_move = next_main_board_move
             boards_move = next_boards_move
+            print 'depth', depth, 'main_move', main_board_move, 'boards_move', boards_move
   return alpha, main_board_move, boards_move
 
+
+def write(data):
+  print 'on move', data['next_move']
+  print 'main_board', data['main_board'], '\n'
+  print 'boards'
+  for i in range(9):
+    print i, data['boards'][i]
+    
+  
  
 if __name__ == "__main__":
   rc = redis.Redis();
   ps = rc.pubsub()
   ps.subscribe(['calculateNextMove']);
-
+  #generiram plocu jedan potez do pobjede
+  potezi1 = [(3,3), (3,4), (3,5), (0,0), (0,1), (0,2), (6,6)]
+  potezi2 = [(1,1), (1,3), (1,8), (5,1), (5,2), (5,3), (7,1)]
+  potez = []
+  for i in range(len(potezi1)):
+    potez += [potezi1[i], potezi2[i]]
+  
   for item in ps.listen():
     if item['type'] == 'message' and item['channel'] == 'calculateNextMove':
       data = json.loads(item['data'])
+      for i in range(len(potez)):
+        data = make_move(potez[i][0], potez[i][1], data)
+        send_move(potez[i][0], potez[i][1], data)
       next_move = calculate_next_move(data)
+      write(data)
 
       send_move(next_move['main_board'], next_move['boards'], data)
-
+      if evaluate(data) == win:
+        print 'win'
+        break
+      if evaluate(data) == -win:
+        print '-win'
+        break
 
 
