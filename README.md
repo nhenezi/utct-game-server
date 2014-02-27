@@ -16,3 +16,4 @@ For full list of packages please see `package.json`.
 ### How to run?
 If you want to enable AI first start websocket server: `npm start` and then run one of scripts located in `/algo`
 directory.
+If you are interested in writing your own bot visit http://ultimatetct.com/make-your-own-bot
