@@ -19,7 +19,17 @@ def send_move(main_board_move, boards_move, oldData):
 # precision
 NUMBER_OF_SIMULATIONS = 1000
 
-def calculate_next_move(data, no_send = False):
+def calculate_next_move(data):
+  '''
+  We are using monte carlo method for calculating best next move.
+  Number of simulations is defined by NUMBER_OF_SIMULATIONS constant.
+
+  Each starting move has a winning percentage defined, winning percentage is
+  calculated as:
+      (number_of_winning_moves * 2 + number_of_tying_moves) /
+      (number_of_winning_moves * 2 + number_of_typing_moves + number_of_losing_moves)
+  Initialy, each move as a winning percentage of 0.5.
+  '''
   player = data['next_move']
   winning_moves = [[0 for _ in xrange(9)] for _ in xrange(9)]
   tying_moves = [[1 for _ in xrange(9)] for _ in xrange(9)]

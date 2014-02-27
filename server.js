@@ -6,7 +6,7 @@ app.http().io()
 
 app.io.route('match', {
   /**
-   * Creates a new match
+   * Forwards next move to redis
    */
   move: function(req) {
     var data;
@@ -19,6 +19,9 @@ app.io.route('match', {
 });
 
 client.subscribe('nextMove');
+/**
+ * Forwards redis messages to client
+ */
 client.on('message', function(channel, data) {
   data = JSON.parse(data);
   console.log(channel, data);
