@@ -1,6 +1,6 @@
 #! /usr/bin/python
 import next_move_monte_carlo as bot1
-import next_move_monte_carlo_old as bot2
+import nextmoveminmax as bot2
 import utct
 
 def play_one_match():
@@ -15,7 +15,7 @@ def play_one_match():
       'next_move': utct.PLAYER_X,
       'next_board': next_board
     }
-    bot1_move = bot1.calculate_next_move(data, no_send=True)
+    bot1_move = bot1.calculate_next_move(data)
     if bot1_move is None:
       break
     boards[bot1_move['main_board']][bot1_move['boards']] = utct.PLAYER_X
@@ -30,7 +30,7 @@ def play_one_match():
       'next_move': utct.PLAYER_Y,
       'next_board': next_board
     }
-    bot2_move = bot2.calculate_next_move(data, no_send=True)
+    bot2_move = bot2.calculate_next_move(data)
     if bot2_move is None:
       break
 
