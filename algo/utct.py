@@ -1,5 +1,6 @@
 #! /usr/bin/python
 
+import copy
 import random
 
 PLAYER_X = 1
@@ -21,16 +22,37 @@ def is_allowed_move(main_board_move, boards_move, main_board, boards):
 def get_valid_moves(board):
   return map(lambda x: x == EMPTY_VALUE, board)
 
+def get_possible_moves(board):
+  valid_moves = get_valid_moves(board)
+  possible_moves = []
+  for i, valid in enumerate(valid_moves):
+    if valid:
+      possible_moves.append(i)
+  return possible_moves
+
 def get_rand_move(board):
   '''Finds random move on board, returns False if no move is valid'''
-  valid_moves = []
-  ss = get_valid_moves(board)
-  for i, valid in enumerate(ss):
-    if valid:
-      valid_moves.append(i)
-  if valid_moves:
-    return random.choice(valid_moves)
+  possible_moves = get_possible_moves(board)
+  if possible_moves:
+    return random.choice(possible_moves)
   return False
+
+
+def get_winning_move(board, player):
+  '''
+  Retrieves a winning move for player on board,
+  None of such move doesn't exists
+  '''
+  possible_moves = get_possible_moves(board)
+  if not possible_moves:
+    return None
+  for move in possible_moves:
+    tmp_board = copy.deepcopy(board)
+    tmp_board[move] = player
+    if winner(tmp_board) != False and winner(tmp_board) != TIE:
+      return move
+
+  return None
 
 
 def winner(board):

@@ -20,6 +20,7 @@ def send_move(main_board_move, boards_move, oldData):
 NUMBER_OF_SIMULATIONS = 1000
 
 def calculate_next_move(data):
+  pprint(data);
   '''
   We are using monte carlo method for calculating best next move.
   Number of simulations is defined by NUMBER_OF_SIMULATIONS constant.
@@ -46,7 +47,6 @@ def calculate_next_move(data):
     # we are caculating success for next move
     next_main_board_move = None
     next_boards_move = None
-
     if utct.winner(main_board) is not False:
       game_over = True
       break
@@ -57,9 +57,15 @@ def calculate_next_move(data):
         main_board_move = next_board
       else:
         main_board_move = utct.get_rand_move(main_board)
-      boards_move = utct.get_rand_move(boards[main_board_move])
+
+      winning_move = utct.get_winning_move(boards[main_board_move], on_move)
+      if winning_move == None:
+        boards_move = utct.get_rand_move(boards[main_board_move])
+      else:
+        boards_move = winning_move
       boards[main_board_move][boards_move] = on_move
       next_board = boards_move
+
       # if this value is not set, this is our next move
       if next_main_board_move == None:
         next_main_board_move = main_board_move
@@ -85,6 +91,7 @@ def calculate_next_move(data):
                                                      losing_moves)
 
   best_move = find_best_move(winning_percentages)
+  print "Best move: ", best_move
   return best_move
 
 def calculate_winning_percentages(winning_moves, tying_moves, losing_moves):
